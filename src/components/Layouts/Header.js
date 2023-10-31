@@ -9,7 +9,7 @@ import { DropdownLoggedOut, DropdownLoggedIn} from "../index";
 export const Header = () => {
     const [darkMode, setDarkMode] = useState(JSON.parse(localStorage.getItem("darkMode")) || false);
     const [searchSection, setSearchSection] = useState(false);
-    const [dropdown, setDropdown] = useState();
+    const [dropdown, setDropdown] = useState(false);
     const token = JSON.parse(sessionStorage.getItem("token"));
 
     useEffect(() =>{
@@ -41,7 +41,7 @@ export const Header = () => {
                     </Link>
                    
                     <span onClick={() => setDropdown(!dropdown)} className="bi bi-person-circle cursor-pointer text-2xl text-gray-700 dark:text-white"></span>
-                    { dropdown && ( token ?  <DropdownLoggedIn /> : <DropdownLoggedOut /> ) }
+                    { dropdown && ( token ?  <DropdownLoggedIn setDropdown={setDropdown} /> : <DropdownLoggedOut setDropdown={setDropdown} /> ) }
                 </div>
             </div>
         </nav>
