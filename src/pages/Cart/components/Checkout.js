@@ -1,13 +1,44 @@
-// import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { toast } from "react-toastify";
-// import { useCart } from "../../../context/CartContext";
-// import { createOrder, getUser } from "../../../services";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useCart } from "../../../context/CartContext";
+import { createOrder, getUser } from "../../../services";
 
-import { useCart } from "../../../context/CartContext"
+
 
 export const Checkout = ({setCheckout}) => {
-    const { total } = useCart();
+    const { cartList, total, clearCart } = useCart();
+    const [user, setUser] = useState({});
+    const navigate = useNavigate();
+    
+    const token = JSON.parse(sessionStorage.getItem("token"))
+    const cbid = JSON.parse(sessionStorage.getItem("cbid"))
+
+    useEffect(() => {
+        async function fetchData(){
+            try {
+                const data = await getUser();
+                setUser(data);     
+            } catch (error) {
+                toast.error(error.message, {closeButton: true, position: "bottom-center"});       
+            }           
+        }
+        fetchData();
+    },[]);
+
+    async function handleOrderSubmit(event){
+        event.preventDefault();
+
+        try {
+            const data = await createOrder(cartList, total, user);       
+            clearCart();
+            navigate("/order-summary", {state: {data: data, status: true} });
+            
+        } catch (error) {
+            toast.error(error.message, {closeButton: true, position: "bottom-center"});
+            navigate("/order-summary", {state: {status: false} });        
+        }     
+    }
     
 
   return (
@@ -26,14 +57,14 @@ export const Checkout = ({setCheckout}) => {
                     <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
                     <i className="bi bi-credit-card mr-2"></i>CARD PAYMENT
                     </h3>
-                    <form  className="space-y-6" >
+                    <form onSubmit={handleOrderSubmit} className="space-y-6" >
                         <div>
                             <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Name:</label>
-                            <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:value-gray-400 dark:text-white" value="Undefined" disabled required="" />
+                            <input type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:value-gray-400 dark:text-white" value={user.name || "Undefined"} disabled required="" />
                         </div>
                         <div>
                             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Email:</label>
-                            <input type="text" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:value-gray-400 dark:text-white" value="backup@example.com" disabled required="" />
+                            <input type="text" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:value-gray-400 dark:text-white" value={user.email || "backup@example.com"} disabled required="" />
                         </div>
                         <div>
                             <label htmlFor="card" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Card Number:</label>

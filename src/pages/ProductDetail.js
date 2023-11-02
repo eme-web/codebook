@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useTitle } from "../hooks/useTitle";
 import { Rating } from "../components";
 import { useCart } from "../context/CartContext";
-// import { getProduct } from "../services";
+import { getProduct } from "../services";
+
+
 
 export const ProductDetail = () => {
   const { cartList, addToCart, removeFromCart} = useCart();
@@ -15,9 +17,12 @@ export const ProductDetail = () => {
 
   useEffect(() =>{
       async function fetchProducts(){
-          const response = await fetch(`http://localhost:8000/products/${id}`);
-          const data =  await response.json();
-          setProduct(data);
+          try {
+            const data =  await getProduct(id);
+            setProduct(data);       
+          } catch (error) {
+            toast.error(error.message, {closeButton: true, position: "bottom-center"});          
+          }        
       }
       fetchProducts();
   },[id]);
