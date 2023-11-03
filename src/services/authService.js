@@ -21,7 +21,7 @@ export async function login(authDetail){
 export async function register(authDetail){
     const requestOptions = {
         method: "POST",
-        headers: {"content-Type": "application/json"},
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(authDetail)
     }  
     const response = await fetch(`${process.env.REACT_APP_HOST}/register`, requestOptions);
